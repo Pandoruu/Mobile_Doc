@@ -238,4 +238,16 @@ fun handleState(state: NetworkState) {
     }
 }
 ```
+Bản thân một lớp sealed luôn là một lớp trừu tượng, và do đó, không thể được khởi tạo trực tiếp. Tuy nhiên, nó có thể chứa hoặc kế thừa các hàm tạo. Các hàm tạo này không dùng để tạo các thể hiện của chính lớp sealed mà dùng cho các lớp con của nó.
+
+Sealed class có constructor chỉ có thể là private hoặc protected:
+```kotlin
+sealed class IOError {
+    // Hàm khởi tạo của lớp sealed mặc định có phạm vi truy cập là protected. 
+    constructor() { /*...*/ }
+
+    // Hàm khởi tạo private, chỉ hiển thị bên trong lớp này.
+    private constructor(description: String): this() { /*...*/ }
+}
+```
 **Lưu ý**: Các lớp con của sealed class phải được khai báo cùng file với sealed class đó.
