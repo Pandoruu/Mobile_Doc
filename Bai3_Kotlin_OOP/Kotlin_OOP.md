@@ -1,10 +1,10 @@
-# Buổi X: Lập trình Hướng Đối Tượng (OOP) trong Kotlin
+# Buổi 3: Lập trình Hướng Đối Tượng (OOP) trong Kotlin
 
-## 1. Giới thiệu về OOP và vai trò trong Kotlin
+## 1. Giới thiệu về OOP
 
-**OOP (Object-Oriented Programming)** – Lập trình hướng đối tượng – là một phương pháp tổ chức chương trình thông qua các “đối tượng” (object), giúp mã nguồn dễ bảo trì, mở rộng, và tái sử dụng. Kotlin là một ngôn ngữ hiện đại kế thừa đầy đủ các tính chất OOP và còn hỗ trợ nhiều cú pháp ngắn gọn, thuận tiện.
+**OOP (Object-Oriented Programming)** – Lập trình hướng đối tượng – là phương pháp tổ chức chương trình thông qua các “đối tượng” (object), giúp mã nguồn dễ bảo trì, mở rộng và tái sử dụng. Kotlin là một ngôn ngữ hiện đại, kế thừa đầy đủ các tính chất OOP và hỗ trợ cú pháp ngắn gọn, thuận tiện.
 
-Bốn tính chất kinh điển của OOP bao gồm:
+Bốn tính chất kinh điển của OOP gồm:
 - **Đóng gói (Encapsulation)**
 - **Kế thừa (Inheritance)**
 - **Đa hình (Polymorphism)**
@@ -14,22 +14,21 @@ Ngoài ra, chúng ta sẽ tìm hiểu về **backing field** – một tính nă
 
 ---
 
-## 2. Đóng gói (Encapsulation)
+## 2. Tính đóng gói (Encapsulation)
 
-### **Khái niệm**
-Đóng gói là quá trình bảo vệ dữ liệu bên trong một lớp (class) bằng cách giới hạn quyền truy cập trực tiếp từ bên ngoài. Chỉ cung cấp các phương thức (getter/setter) để thao tác với dữ liệu.
+### Khái niệm
+Đóng gói là quá trình bảo vệ dữ liệu bên trong một lớp bằng từ khóa `private`, `protected`,... Chỉ cho phép truy cập thông qua các phương thức kiểm soát (getter/setter).
 
-### **Lợi ích**
+### Lợi ích
 - Ngăn chặn sửa đổi dữ liệu bừa bãi.
-- Giúp kiểm soát giá trị hợp lệ của thuộc tính.
+- Kiểm soát giá trị hợp lệ của thuộc tính.
 - Dễ bảo trì, thay đổi cài đặt bên trong mà không ảnh hưởng bên ngoài.
 
-### **Cách hiện thực trong Kotlin**
+### Cách hiện thực trong Kotlin
 - Dùng từ khóa `private`, `protected` cho thuộc tính.
-- Dùng hàm `get`/`set` để truy xuất và kiểm soát.
+- Custom getter/setter để kiểm soát việc truy cập và chỉnh sửa.
 
-
-**Ví dụ 1: Che giấu dữ liệu**
+**Ví dụ:**
 ```kotlin
 class Account(private var balance: Int) {
     fun getBalance(): Int = balance
@@ -40,30 +39,26 @@ class Account(private var balance: Int) {
         if (amount > 0 && amount <= balance) balance -= amount
     }
 }
-fun main() {
-    val acc = Account(1000)
-    acc.deposit(500)
-    acc.withdraw(200)
-    println("Số dư: ${acc.getBalance()}") // Số dư: 1300
-}
 ```
 
-**Ví dụ 2: Custom getter/setter**
+Custom getter:
 ```kotlin
 class Product(val name: String, private var _price: Double) {
-    var price: Double
-        get() = if (_price < 0) 0.0 else _price // Nếu giá nhỏ hơn 0 thì trả về 0.0
-        set(value) { _price = value }
-}
+    fun getPrice(): Double =
+        if (_price < 0) 0.0 else _price
 
+    fun setPrice(value: Double) {
+        _price = value
+    }
+}
 fun main() {
     val p = Product("Bánh mì", -5000.0)
-    println("${p.name}: ${p.price}") // Bánh mì: 0.0
-    p.price = 12000.0 //thay vì .get() như Java thì ta sẽ chấm trực tiếp tới biến đó nếu có getter
-    println("${p.name}: ${p.price}") // Bánh mì: 12000.0
+    println("${p.name}: ${p.getPrice()}") // Bánh mì: 0.0
+    p.setPrice(12000.0)
+    println("${p.name}: ${p.getPrice()}") // Bánh mì: 12000.0
 }
 ```
-
+Custom setter:
 ```kotlin
 class Student {
     var name: String = "Unknown"
@@ -71,179 +66,249 @@ class Student {
             field = value.trim().replaceFirstChar { it.uppercase() }
         }
 }
-fun main() {
-    val st = Student()
-    st.name = "  an" // setter sẽ tự động chuẩn hóa
-    println(st.name) // "An"
-}
 ```
-**Điểm nổi bật:**  
-- Có thể kiểm soát logic khi gán giá trị mới cho thuộc tính.
 
 ---
 
-## 3. Kế thừa (Inheritance)
+## 3. Tính kế thừa (Inheritance)
 
-### **Khái niệm**
-Kế thừa cho phép một lớp con (subclass) thừa hưởng thuộc tính và phương thức từ lớp cha (superclass), đồng thời có thể mở rộng, bổ sung hoặc ghi đè (override) các hành vi đó.
+### Khái niệm
+- Tất cả các class trong Kotlin đều ngầm kế thừa từ class gốc `Any`, cung cấp các phương thức như: `equals()`, `hashCode()`, và `toString()`.
+- Mặc định, các class trong Kotlin là **final** (không thể kế thừa). Muốn cho phép kế thừa, phải thêm từ khóa `open`.
 
-### **Lợi ích**
-- Tái sử dụng mã nguồn hiệu quả.
-- Tạo cấu trúc phân cấp ngắn gọn, rõ ràng.
+### Cách khai báo kế thừa
 
-### **Cách hiện thực trong Kotlin**
-- Lớp cha phải khai báo với `open` hoặc `abstract`.
-- Lớp con dùng dấu `:` để kế thừa.
-
-### **Ví dụ nổi bật**
-
-**Ví dụ 1: Kế thừa và mở rộng**
+**Ví dụ:**
 ```kotlin
-open class Animal(val name: String) {
-    open fun speak() = println("$name phát ra âm thanh lạ.")
-}
+open class Base(p: Int) // có thể được kế thừa
 
-class Cat(name: String) : Animal(name) {
-    override fun speak() = println("$name kêu: Meo meo!")
-}
+class Derived(p: Int) : Base(p) // kế thừa từ Base, truyền tham số vào constructor cha
+```
+- Nếu lớp cha có **primary constructor**, lớp con **bắt buộc** phải gọi lại trong phần khai báo.
+- Nếu lớp con không có primary constructor, mỗi secondary constructor phải gọi `super(...)` đến constructor khác đã gọi tới cha.
 
+**Ví dụ với secondary constructor:**
+```kotlin
+class GmailSender : EmailSender {
+    // Constructor 1: chỉ có recipient
+    constructor(recipient: String) : super(recipient) {
+        println("Using default Gmail server")
+    }
+
+    // Constructor 2: có thêm server address
+    constructor(recipient: String, server: String) : super(recipient) {
+        println("Using custom Gmail server: $server")
+    }
+}
 fun main() {
-    val tom = Cat("Tom")
-    tom.speak() // Tom kêu: Meo meo!
+    val mail1 = GmailSender("a@example.com")
+    println()
+    val mail2 = GmailSender("b@example.com", "sigma")
+}
+```
+Kết quá:
+```
+Sending email to a@example.com  
+Using default Gmail server
+
+Sending email to b@example.com  
+Using custom Gmail server: sigma
+```
+### Thứ tự khởi tạo
+- Constructor của lớp cha được gọi **trước tiên**, sau đó mới tới constructor của lớp con.
+- Các thuộc tính `open` trong lớp con **chưa được khởi tạo** khi constructor của lớp cha thực thi.
+
+**Ví dụ minh họa:**
+```kotlin
+open class Base(val name: String) {
+    init { println("Khởi tạo lớp cha") }
+    open val size: Int = name.length.also { println("Khởi tạo size ở lớp cha: $it") }
+}
+
+class Derived(name: String, val lastName: String)
+    : Base(name.replaceFirstChar { it.uppercase() }.also { println("Tham số truyền cho cha: $it") }) {
+
+    init { println("Khởi tạo lớp con") }
+    override val size: Int = (super.size + lastName.length)
+        .also { println("Khởi tạo size ở lớp con: $it") }
 }
 ```
 
-**Ví dụ 2: Kế thừa nhiều cấp**
-```kotlin
-open class Vehicle(val brand: String) {
-    open fun move() = println("$brand di chuyển")
-}
-class Car(brand: String, val seat: Int) : Vehicle(brand) {
-    override fun move() = println("$brand chạy bằng 4 bánh với $seat ghế")
-}
-class Bus(brand: String, seat: Int) : Car(brand, seat) {
-    fun pickUp() = println("$brand đón khách")
-}
-fun main() {
-    val bus = Bus("Hyundai", 45)
-    bus.move()    // Hyundai chạy bằng 4 bánh với 45 ghế
-    bus.pickUp()  // Hyundai đón khách
-}
-```
-**Lưu ý**:
-- Kotlin chỉ cho phép kế thừa đơn (mỗi lớp chỉ có một cha).
-- Lớp cha cần có từ khóa `open` hoặc `abstract`.
-- Khi kế thừa từ một lớp cha trong Kotlin, nếu lớp cha có primary constructor (hàm khởi tạo chính), thì lớp con bắt buộc phải gọi lại (super) hàm khởi tạo này trong phần khai báo constructor của mình.
----
-## 4. Đa hình (Polymorphism)
+### Ghi đè (Overriding)
+- Chỉ các method/properties khai báo với từ khóa `open` hoặc thuộc interface mới được override.
+- Dùng từ khóa `override` ở lớp con.
+- Nếu muốn **cấm ghi đè tiếp**, dùng `final override`.
 
-### **Khái niệm**
-Đa hình cho phép đối tượng cùng kiểu cha có thể biểu hiện hành động khác nhau tùy thuộc vào lớp con thực tế được khởi tạo.
-
-### **Lợi ích**
-- Linh hoạt mở rộng hệ thống.
-- Tăng tính trừu tượng và dễ mở rộng.
-
-### **Cách hiện thực trong Kotlin**
-- Dùng `open`/`override` cho phương thức.
-- Có thể khai báo biến kiểu cha, nhưng gán đối tượng kiểu con.
-
-### **Ví dụ nổi bật**
-
-**Ví dụ 1: Đa hình qua phương thức override**
+**Ví dụ:**
 ```kotlin
 open class Shape {
-    open fun area(): Double = 0.0
-}
-class Circle(val radius: Double) : Shape() {
-    override fun area() = Math.PI * radius * radius
-}
-class Rectangle(val width: Double, val height: Double) : Shape() {
-    override fun area() = width * height
-}
-fun printArea(shape: Shape) {
-    println("Diện tích: ${shape.area()}")
+    open fun draw() { println("Drawing shape") }
+    fun fill() { println("Fill shape") }
 }
 
-fun main() {
-    val shapes = listOf(Circle(2.0), Rectangle(3.0, 4.0))
-    for (s in shapes) printArea(s)
-    // Diện tích: 12.566370614359172
-    // Diện tích: 12.0
+class Circle : Shape() {
+    override fun draw() { println("Drawing circle") }
 }
 ```
 
-**Ví dụ 2: Đa hình thông qua Interface**
+### Ghi đè thuộc tính
+- Có thể override property với cùng kiểu hoặc override `val` bằng `var`, nhưng không ngược lại.
+
+**Ví dụ:**
 ```kotlin
-interface Drawable {
-    fun draw()
+open class Shape {
+    open val vertexCount: Int = 0
 }
-class Square : Drawable {
-    override fun draw() = println("Vẽ hình vuông")
-}
-class Triangle : Drawable {
-    override fun draw() = println("Vẽ hình tam giác")
-}
-fun main() {
-    val shapes: List<Drawable> = listOf(Square(), Triangle())
-    shapes.forEach { it.draw() }
-    // Vẽ hình vuông
-    // Vẽ hình tam giác
+class Rectangle : Shape() {
+    override val vertexCount = 4
 }
 ```
 
-Ứng dụng của tính đa hình:
+**Override property trong constructor:**
 ```kotlin
+interface Shape { val vertexCount: Int }
+class Rectangle(override val vertexCount: Int = 4) : Shape
+class Polygon : Shape { override var vertexCount: Int = 0 }
+```
+
+### Gọi hàm/thuộc tính từ lớp cha
+- Dùng `super` để gọi hàm/thuộc tính từ lớp cha.
+- Trong inner class, dùng `super@Outer` để gọi hàm cha của lớp ngoài.
+
+**Ví dụ:**
+```kotlin
+open class Rectangle {
+    open fun draw() { println("Drawing a rectangle") }
+    val borderColor: String get() = "black"
+}
+class FilledRectangle : Rectangle() {
+    override fun draw() {
+        super.draw()
+        println("Filling the rectangle")
+    }
+    val fillColor: String get() = super.borderColor
+}
+```
+
+**Ví dụ inner class:**
+```kotlin
+class FilledRectangle: Rectangle() {
+    override fun draw() {
+        val filler = Filler()
+        filler.drawAndFill()
+    }
+    inner class Filler {
+        fun fill() { println("Filling") }
+        fun drawAndFill() {
+            super@FilledRectangle.draw()
+            fill()
+            println("Drawn a filled rectangle with color ${super@FilledRectangle.borderColor}")
+        }
+    }
+}
+```
+
+### Kế thừa đa nguồn và quy tắc override
+- Nếu kế thừa từ nhiều class/interface có cùng tên hàm, **bắt buộc** phải override và chỉ rõ super từ đâu.
+
+**Ví dụ:**
+```kotlin
+open class Rectangle { open fun draw() { println("Rectangle") } }
+interface Polygon { fun draw() { println("Polygon") } }
+
+class Square : Rectangle(), Polygon {
+    override fun draw() {
+        super<Rectangle>.draw()
+        super<Polygon>.draw()
+    }
+}
+```
+
+---
+
+## 4. Tính đa hình (Polymorphism)
+
+### Khái niệm
+Đa hình cho phép một hàm, biến kiểu cha xử lý nhiều loại đối tượng là các lớp con khác nhau.
+
+### Ví dụ
+```kotlin
+// Lớp cha (Base class)
 open class Animal {
-    open fun speak() = println("Some sound")
+    open fun makeSound() {
+        println("Some generic animal sound")
+    }
 }
 
+// Lớp con kế thừa và override phương thức
 class Dog : Animal() {
-    override fun speak() = println("Woof!")
+    override fun makeSound() {
+        println("Woof! Woof!")
+    }
 }
 
 class Cat : Animal() {
-    override fun speak() = println("Meow!")
-}
-
-fun makeAnimalSpeak(animal: Animal) {
-    animal.speak()
-}
-
-fun main() {
-    val animals: List<Animal> = listOf(Dog(), Cat(), Animal())
-    for (a in animals) {
-        makeAnimalSpeak(a)
+    override fun makeSound() {
+        println("Meow~")
     }
 }
-// Kết quả:
-// Woof!
-// Meow!
-// Some sound
+
+// Hàm sử dụng đa hình
+fun playWithAnimal(animal: Animal) {
+    animal.makeSound()
+}
+fun main() {
+    val dog = Dog()
+    val cat = Cat()
+
+    playWithAnimal(dog) // Output: Woof! Woof!
+    playWithAnimal(cat) // Output: Meow~
+}
 ```
-**Điểm nổi bật:**  
-- T có thể đạt được Đa hình cả ở class và interface.
-- Một hàm có thể xử lý nhiều loại đối tượng cùng lúc qua cùng một kiểu cha.
+Mặc dù `playWithAnimal()` nhận vào kiểu `Animal`, nhưng khi truyền vào `Dog` hay `Cat`, chương trình sẽ gọi đúng phương thức `makeSound()` tương ứng 
+### Đa hình với interface
+```kotlin
+// Định nghĩa interface
+interface Drawable {
+    fun draw()
+}
+
+// Các lớp triển khai interface
+class Circle : Drawable {
+    override fun draw() {
+        println("Drawing a circle")
+    }
+}
+
+class Rectangle : Drawable {
+    override fun draw() {
+        println("Drawing a rectangle")
+    }
+}
+
+// Hàm sử dụng tính đa hình
+fun render(d: Drawable) {
+    d.draw()
+}
+fun main() {
+    val shapes: List<Drawable> = listOf(Circle(), Rectangle())
+
+    for (shape in shapes) {
+        render(shape)
+    }
+//Drawing a circle  
+//Drawing a rectangle
+}
+```
 
 ---
 
-## 5. Trừu tượng (Abstraction)
+## 5. Tính trừu tượng (Abstraction)
 
-### **Khái niệm**
-Trừu tượng là khi ta chỉ mô tả một hàm là “cái gì” mà không quan tâm bên trong đó “làm như thế nào”.  
-Lớp trừu tượng (abstract class) hoặc interface cung cấp các phương thức chưa cài đặt, yêu cầu lớp con phải thực hiện.
+### Khái niệm
+Trừu tượng là khi ta chỉ định nghĩa “cái gì” mà không quan tâm “làm như thế nào”. Lớp abstract hoặc interface cung cấp các hàm chưa cài đặt, yêu cầu lớp con phải thực hiện.
 
-### **Lợi ích**
-- Tăng tính linh hoạt, dễ thay đổi/hoán đổi cài đặt.
-- Định nghĩa khung hành vi chuẩn cho nhiều lớp con phải tuân theo.
-
-### **Cách hiện thực trong Kotlin**
-- Sử dụng từ khóa `abstract` cho class hoặc method.
-- Interface cũng là một dạng trừu tượng hóa hoàn toàn.
-
-### **Ví dụ nổi bật**
-
-**Ví dụ 1: Abstract Class**
+### Ví dụ abstract class
 ```kotlin
 abstract class Employee(val name: String) {
     abstract fun calcSalary(): Int
@@ -254,54 +319,26 @@ class FullTime(name: String, val base: Int) : Employee(name) {
 class PartTime(name: String, val hour: Int, val wage: Int) : Employee(name) {
     override fun calcSalary() = hour * wage
 }
-fun main() {
-    val emp: List<Employee> = listOf(
-        FullTime("An", 5_000_000),
-        PartTime("Hải", 80, 100_000)
-    )
-    emp.forEach { println("${it.name}: ${it.calcSalary()}") }
-    // An: 10000000
-    // Hải: 8000000
-}
 ```
 
-**Ví dụ 2: Interface trừu tượng hóa**
+### Ví dụ interface
 ```kotlin
-interface Logger {
-    fun log(msg: String)
-}
-class FileLogger : Logger {
-    override fun log(msg: String) = println("Ghi file: $msg")
-}
-class ConsoleLogger : Logger {
-    override fun log(msg: String) = println("Màn hình: $msg")
-}
-fun main() {
-    val logger: Logger = FileLogger()
-    logger.log("Đây là log!") // Ghi file: Đây là log!
-}
+interface Logger { fun log(msg: String) }
+class FileLogger : Logger { override fun log(msg: String) = println("Ghi file: $msg") }
+class ConsoleLogger : Logger { override fun log(msg: String) = println("Màn hình: $msg") }
 ```
-**Điểm nổi bật:**  
-- Không thể tạo thực thể từ abstract class hoặc interface.
-- Lớp con **bắt buộc** phải cài đặt các hàm abstract.
 
 ---
 
-## 6. Backing Field trong Kotlin
+## 6. Backing field
 
-### **Khái niệm**
+### Khái niệm
 **Backing field** là trường dữ liệu ẩn mà Kotlin tự động sinh ra để lưu trữ giá trị thực của một property khi bạn tự viết getter/setter cho property đó.
 
-- Khi ta muốn kiểm soát logic truy cập/gán cho property (ví dụ: kiểm tra hợp lệ, log thay đổi,…)
-- Không có backing field, property sẽ gây vòng lặp vô hạn khi gán/gọi chính nó trong getter/setter.
+- Dùng từ khóa `field` trong getter/setter để truy cập giá trị thực.
+- Chỉ dùng được trong phạm vi getter/setter của property đó.
 
-### **Quy tắc sử dụng**
-- Chỉ dùng được từ khóa `field` bên trong getter/setter custom của property đó.
-- Không thể dùng `field` ngoài phạm vi getter/setter.
-
-### **Ví dụ nổi bật**
-
-**Ví dụ 1: Kiểm soát giá trị hợp lệ**
+### Ví dụ
 ```kotlin
 class Person {
     var age: Int = 18
@@ -310,54 +347,15 @@ class Person {
             else println("Tuổi không hợp lệ!")
         }
 }
-fun main() {
-    val p = Person()
-    p.age = 25
-    println(p.age) // 25
-    p.age = -1     // Tuổi không hợp lệ!
-    println(p.age) // 25
-}
 ```
-
-**Ví dụ 2: Đếm số lần property bị thay đổi**
-```kotlin
-class Counter {
-    var count: Int = 0
-        set(value) {
-            println("Giá trị mới: $value")
-            field = value
-        }
-}
-fun main() {
-    val c = Counter()
-    c.count = 10 // Giá trị mới: 10
-    c.count = 20 // Giá trị mới: 20
-}
-```
-
-**Ví dụ 3: Custom getter chỉ đọc, không cho set**
+**Chỉ getter, không có backing field:**
 ```kotlin
 class Rectangle(val width: Int, val height: Int) {
     val area: Int
-        get() = width * height
-}
-fun main() {
-    val r = Rectangle(4, 5)
-    println(r.area) // 20
-    // r.area = 100 // Lỗi, chỉ read-only
+        get() = width * height // Chỉ getter, không có backing field
 }
 ```
 
-**Điểm nổi bật:**  
-- `field` đại diện cho giá trị thực lưu trữ bên trong property.
-- Khi chỉ custom getter (không có setter), backing field **không được tạo ra**.
-
 ---
 
-## 7. Tổng Kết
-
-- **Đóng gói (Encapsulation):** Che giấu dữ liệu, chỉ cho thao tác qua giao diện an toàn.  
-- **Kế thừa (Inheritance):** Tái sử dụng, mở rộng hành vi của lớp cha.  
-- **Đa hình (Polymorphism):** Hành vi phong phú qua cùng một giao diện hoặc kiểu cha.  
-- **Trừu tượng (Abstraction):** Xác định hành vi chung, ẩn đi chi tiết cài đặt.  
-- **Backing field:** Biến ẩn giúp quản lý property an toàn, linh hoạt, đặc trưng của Kotlin.
+> **Hãy thực hành từng ví dụ trên để hiểu rõ bản chất và sức mạnh của OOP trong Kotlin!**
