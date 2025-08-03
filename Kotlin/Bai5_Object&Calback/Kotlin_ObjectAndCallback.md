@@ -517,3 +517,8 @@ Hàm `processData` nhận 2 tham số:
 
 Sau khi xử lý dữ liệu, `processData` gọi `callback(result)` để trả kết quả ra ngoài.
 Khi gọi `processData`, ta có thể truyền vào một lambda, anonymous func hoặc một hàm có sẵn.
+
+**Công dụng:**
+- Tách biệt logic xử lý: Hàm chính chỉ lo xử lý công việc, còn việc làm gì với kết quả thì giao cho callback.
+- Xử lý bất đồng bộ: Đặc biệt hữu ích trong các thao tác bất đồng bộ như đọc file, gọi API, xử lý xong rồi mới gọi callback.
+- Tái sử dụng mã lệnh: Có thể truyền các callback khác nhau vào cùng một hàm để có hành vi linh hoạt.
