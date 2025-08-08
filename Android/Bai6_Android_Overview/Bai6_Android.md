@@ -531,63 +531,153 @@ Log.e("Login", "Lỗi đăng nhập: " + errorMessage);
 - Sắp xếp view con theo chiều ngang (`horizontal`) hoặc dọc (`vertical`).
 - Dùng thuộc tính `weight` để chia tỷ lệ không gian.
 
+**Các thuộc tính hay dùng:**
+- `android:orientation` – Hướng sắp xếp view con (`horizontal` hoặc `vertical`).
+- `android:layout_weight` – Chia tỷ lệ không gian cho các view con (chỉ dùng khi layout_width hoặc layout_height của view con là `0dp`).
+- `android:gravity` – Căn chỉnh nội dung bên trong LinearLayout (ví dụ: `center`, `start`, `end`, `top`, `bottom`).
+- `android:layout_gravity` – Căn chỉnh vị trí của từng view con bên trong LinearLayout.
+- `android:baselineAligned` – Căn chỉnh theo baseline cho các view con (mặc định là `true`).
+- `android:divider` – Đặt đường kẻ phân cách giữa các view con (API 11+).
+- `android:showDividers` – Xác định hiển thị divider ở vị trí nào (`beginning`, `middle`, `end`).
+- `android:weightSum` – Tổng số weight của các view con, giúp kiểm soát phân chia không gian.
+
 **Ví dụ:**
 ```xml
 <LinearLayout
     android:orientation="horizontal"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    android:gravity="center_vertical"
+    android:divider="?android:attr/dividerHorizontal"
+    android:showDividers="middle"
+    android:weightSum="3">
+
     <Button
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="1"
-        android:text="Trái"/>
+        android:text="Trái"
+        android:layout_gravity="center"/>
+
     <Button
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="2"
-        android:text="Phải"/>
+        android:text="Phải"
+        android:layout_gravity="center"/>
 </LinearLayout>
 ```
 
+---
+
 #### 1.3. RelativeLayout
 
-- Định vị view con tương đối nhau (trên/dưới/trái/phải).
-- Giảm số lượng layout lồng nhau so với LinearLayout.
+- Định vị view con một cách tương đối nhau (trên/dưới/trái/phải).
+- Đặc điểm: Giảm số lượng layout lồng nhau so với LinearLayout.
+
+**Các thuộc tính hay dùng:**
+- `android:layout_alignParentTop`, `android:layout_alignParentBottom`, `android:layout_alignParentLeft`, `android:layout_alignParentRight`, `android:layout_alignParentStart`, `android:layout_alignParentEnd` – Đặt view sát các cạnh của parent.
+- `android:layout_centerInParent` – Đặt view vào giữa parent (cả ngang và dọc).
+- `android:layout_centerHorizontal`, `android:layout_centerVertical` – Đặt view vào giữa theo chiều ngang hoặc dọc.
+- `android:layout_toLeftOf`, `android:layout_toRightOf`, `android:layout_above`, `android:layout_below` – Đặt view ở vị trí tương đối so với view khác (dùng id).
+- `android:layout_alignBaseline` – Căn baseline của view với view khác.
+- `android:layout_alignTop`, `android:layout_alignBottom`, `android:layout_alignStart`, `android:layout_alignEnd` – Căn cạnh view với cạnh view khác.
+- `android:layout_margin...` – Đặt margin cho view con (top, bottom, left, right, start, end).
 
 **Ví dụ:**
 ```xml
 <RelativeLayout
     android:layout_width="match_parent"
     android:layout_height="match_parent">
+
     <Button
         android:id="@+id/btnLeft"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Trái"/>
+        android:text="Trái"
+        android:layout_alignParentStart="true"
+        android:layout_centerVertical="true"/>
+
     <Button
         android:id="@+id/btnRight"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Phải"
-        android:layout_toRightOf="@id/btnLeft"/>
+        android:layout_toEndOf="@id/btnLeft"
+        android:layout_alignBaseline="@id/btnLeft"/>
+
+    <TextView
+        android:id="@+id/tvCenter"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Giữa"
+        android:layout_centerInParent="true"/>
 </RelativeLayout>
 ```
+
+---
 
 #### 1.4. TableLayout, GridLayout
 
 - Sắp xếp các view theo dạng bảng, lưới.
 
+**Các thuộc tính hay dùng TableLayout:**
+- `android:stretchColumns` – Chỉ định cột nào sẽ được kéo giãn để chiếm hết không gian dư.
+- `android:shrinkColumns` – Chỉ định cột nào sẽ bị thu nhỏ khi không đủ không gian.
+- `android:collapseColumns` – Chỉ định cột nào sẽ bị ẩn đi.
+- `android:layout_span` (trong TableRow) – View con có thể chiếm nhiều cột (gộp ô, như trong Excel).
+- `android:layout_column` – Chỉ định cột cho view con.
+
+**Các thuộc tính hay dùng GridLayout:**
+- `android:rowCount`, `android:columnCount` – Xác định số hàng và số cột của GridLayout.
+- `android:layout_row`, `android:layout_column` – Chỉ định vị trí row/column cho view con.
+- `android:layout_rowSpan`, `android:layout_columnSpan` – Chỉ định view con chiếm nhiều hàng/cột.
+- `android:orientation` – Xác định hướng sắp xếp view con (horizontal/dọc hoặc vertical/ngang).
+- `android:layout_gravity` – Căn chỉnh vị trí view con bên trong lưới.
+
 **Ví dụ TableLayout:**
 ```xml
 <TableLayout
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    android:stretchColumns="1">
+
     <TableRow>
         <TextView android:text="Cột 1"/>
         <TextView android:text="Cột 2"/>
     </TableRow>
+    <TableRow>
+        <TextView android:text="Dữ liệu 1"/>
+        <TextView android:text="Dữ liệu 2"/>
+    </TableRow>
 </TableLayout>
+```
+
+**Ví dụ GridLayout:**
+```xml
+<GridLayout
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:rowCount="2"
+    android:columnCount="2">
+
+    <TextView
+        android:text="A"
+        android:layout_row="0"
+        android:layout_column="0"/>
+    <TextView
+        android:text="B"
+        android:layout_row="0"
+        android:layout_column="1"/>
+    <TextView
+        android:text="C"
+        android:layout_row="1"
+        android:layout_column="0"/>
+    <TextView
+        android:text="D"
+        android:layout_row="1"
+        android:layout_column="1"/>
+</GridLayout>
 ```
 
 #### 1.5. ConstraintLayout
@@ -679,15 +769,71 @@ app:layout_constraintBaseline_toBaselineOf="@id/textViewTitle"
 Dòng chữ của hai View sẽ nằm cùng một đường ngang.
 
 ##### 6. `app:layout_constraintHorizontal_chainStyle`
-Chỉ định kiểu phân bố các View nằm trong **chuỗi ngang (horizontal chain)**:
-- `spread`: Các View được giãn đều ra (mặc định).
-- `spread_inside`: Hai View ở đầu và cuối sát parent, các View còn lại giãn đều khoảng cách giữa chúng.
-- `packed`: Các View gom lại sát nhau, toàn chuỗi nằm ở giữa.
 
-**Ví dụ:**
+Thuộc tính này dùng để xác định **kiểu phân bố (chain style)** cho một chuỗi các View nằm ngang trong `ConstraintLayout`. Chuỗi (chain) là tập hợp các View được liên kết với nhau bằng các constraint ngang (start/end).
+
+**Các kiểu chain style và ý nghĩa:**
+
+- `spread`:
+  - Các View trong chuỗi sẽ được giãn đều ra trong không gian giữa hai constraint ngoài cùng (ví dụ: giữa cạnh start và end của parent hoặc View ở đầu/ cuối chuỗi).
+  - Các khoảng cách giữa các View đều nhau.
+  - Thích hợp khi muốn các View phân bố đều trên một hàng.
+
+- `spread_inside`:  
+  - Hai View ở đầu và cuối chuỗi sẽ được **dính sát** vào 2 constraint ngoài cùng (ví dụ: cạnh start và end của parent).
+  - Các View còn lại trong chuỗi được giãn đều khoảng cách **giữa chúng**, nhưng không sát parent.
+  - Phù hợp khi muốn 2 View ngoài cùng sát biên layout, các View giữa thì đều nhau.
+
+- `packed`:  
+  - Các View trong chuỗi sẽ **gom lại sát nhau** (không có khoảng cách thừa giữa các View).
+  - **Toàn bộ chuỗi** sẽ nằm giữa không gian constraint ngoài cùng (ví dụ: giữa start và end của parent).
+  - Có thể điều chỉnh vị trí chuỗi bằng thuộc tính `app:layout_constraintHorizontal_bias` (giá trị từ 0.0 đến 1.0).
+  - Thích hợp khi muốn một nhóm View nằm giữa hoặc lệch về một phía trong layout.
+
+**Cách tạo chain ngang:**
+- Để tạo một chuỗi View ngang, bạn cần thiết lập constraint `start_toEndOf` và `end_toStartOf` liên tiếp giữa các View con, đồng thời constraint View đầu tiên với `parent` (hoặc View khác).
+- Chỉ cần một View trong chuỗi (thường là View đầu tiên hoặc cuối cùng) khai báo thuộc tính `app:layout_constraintHorizontal_chainStyle` là đủ.
+
+**Ví dụ: Chuỗi 3 nút Button nằm ngang với chain style là `packed`**
+
 ```xml
-app:layout_constraintHorizontal_chainStyle="packed"
+<androidx.constraintlayout.widget.ConstraintLayout
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <Button
+        android:id="@+id/btn1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Button 1"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/btn2"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintHorizontal_chainStyle="packed"/>
+
+    <Button
+        android:id="@+id/btn2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Button 2"
+        app:layout_constraintStart_toEndOf="@id/btn1"
+        app:layout_constraintEnd_toStartOf="@id/btn3"
+        app:layout_constraintTop_toTopOf="parent"/>
+
+    <Button
+        android:id="@+id/btn3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Button 3"
+        app:layout_constraintStart_toEndOf="@id/btn2"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"/>
+</androidx.constraintlayout.widget.ConstraintLayout>
 ```
+
+**Kết quả:**
+- Ba nút Button sẽ nằm sát nhau ở giữa hàng ngang, không có khoảng cách thừa giữa các nút.
+
 
 
 **Một số tính năng nổi bật:**
