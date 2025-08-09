@@ -855,7 +855,13 @@ Thuộc tính này dùng để xác định **kiểu phân bố (chain style)** 
 ViewBinding là tính năng giúp truy cập các view trong layout an toàn, mạnh mẽ, hiệu quả, thay thế `findViewById`.
 
 **Cách bật ViewBinding:**
-- Thêm vào `build.gradle (Module: app)`:
+- Bật `viewBinding` trong `buildFeatures`
+```kotlin
+buildFeatures {
+        viewBinding = true
+    }
+```
+- Hoặc thêm vào `build.gradle (Module: app)`:
 ```gradle
 android {
     ...
@@ -866,58 +872,55 @@ android {
 ```
 - Sync project.
 
+**Cách sử dụng**
+
+Khi bật ViewBinding, Android Studio sẽ **tự động sinh ra một class** binding cho mỗi file layout XML. Class này có tên theo quy tắc:  
+`Tên_file_layout.xml` → `TênFileLayoutBinding` (ví dụ: `activity_main.xml` → `ActivityMainBinding`).
+
 **Cách sử dụng trong Activity:**
+- Khởi tạo biến binding với class tương ứng bằng phương thức `inflate()`.
+
 ```kotlin
-class MainActivity : AppCompatActivity() {
-    private lateinit var binding: ActivityMainBinding
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        binding = ActivityMainBinding.inflate(layoutInflater)
-        setContentView(binding.root)
-        binding.tvHello.text = "Xin chào"
-        binding.btnClick.setOnClickListener {
-            Toast.makeText(this, "Nhấn!", Toast.LENGTH_SHORT).show()
-        }
-    }
+private lateinit var binding: ActivityMainBinding
+//trong hàm `onCreate()`
+binding = ActivityMainBinding.inflate(layoutInflater)
+```
+- Gán layout root của binding cho `setContentView()`.
+```kotlin
+//trong hàm `onCreate()`
+setContentView(binding.root)
+```
+**Sau đó ta có thể thao tác với các view như:**
+- Truy xuất các thuộc tính
+```kotlin
+// Lấy nội dung EditText
+val name: String = binding.editTextName.text.toString()
+
+// Lấy trạng thái CheckBox
+val isSubscribed: Boolean = binding.checkBoxSubscribe.isChecked
+
+// Lấy lựa chọn RadioGroup
+val selectedRadioId = binding.radioGroupGender.checkedRadioButtonId
+val gender: String = when (selectedRadioId) {
+    R.id.radioMale -> "Nam"
+    R.id.radioFemale -> "Nữ"
+    else -> "Không xác định"
 }
 ```
-
-**Trong Fragment:**
+- Thiết lập các thuộc tính
 ```kotlin
-class HomeFragment : Fragment(R.layout.fragment_home) {
-    private var _binding: FragmentHomeBinding? = null
-    private val binding get() = _binding!!
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        _binding = FragmentHomeBinding.bind(view)
-        binding.tvTitle.text = "Hello Fragment"
-    }
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _binding = null
-    }
-}
-```
+binding.myTextView.text = "tex mới"
+binding.myButton.isEnabled = false // ẩn nút
+binding.progressBar.progress = 50 // đặt tiến trình cho progressBar
 
-**Trong Adapter:**
-```kotlin
-class UserAdapter : RecyclerView.Adapter<UserAdapter.UserViewHolder>() {
-    class UserViewHolder(val binding: ItemUserBinding) : RecyclerView.ViewHolder(binding.root)
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): UserViewHolder {
-        val binding = ItemUserBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-        return UserViewHolder(binding)
-    }
-    override fun onBindViewHolder(holder: UserViewHolder, position: Int) {
-        // Truy cập view thông qua holder.binding
-    }
-    ...
-}
+binding.myImageView.setImageResource(R.drawable.avatar) //đổi ảnh
+// hoặc dùng Glide, Picasso để load ảnh từ internet
+Glide.with(this).load(url).into(binding.avatarImage)
 ```
-
 **Ưu điểm ViewBinding:**
 - An toàn kiểu dữ liệu, không sợ NullPointerException.
 - Không cần ép kiểu.
-- Dễ đọc, dễ maintain.
+- Dễ đọc, dễ bảo trì.
 
 **Lưu ý:**
-- Không hỗ trợ các layout dùng `<merge/>` làm root.
 - Tên class binding theo quy tắc PascalCase: file `activity_main.xml` → `ActivityMainBinding`.
