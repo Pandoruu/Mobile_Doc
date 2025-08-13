@@ -1,6 +1,3 @@
-Truyền dữ liệu giữa hai Activity
-Tìm hiểu thêm: Multi-resume, onTopResumedActivityChanged()
-
 ## 1. Foreground, background application trong android
 #### 1.1. Foreground application
 Nếu như trên máy tính, màn hình to, rộng nên có thể hiển thị cùng lúc nhiều cửa sổ / màn hình của nhiều ứng dụng. Trên mobile thì ứng dụng cũng được chạy song song nhưng vì màn hình nhỏ nên nó chỉ hiển thị 1 app vào 1 thời điểm. Ứng đang chạy, đang hiển thị thì nó được gọi là `foreground application`.
