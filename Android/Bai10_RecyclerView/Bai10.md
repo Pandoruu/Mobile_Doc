@@ -186,11 +186,63 @@ class UserListAdapter : ListAdapter<User, UserListAdapter.UserViewHolder>(UserDi
 userListAdapter.submitList(newUserList)
 ```
 
+![alt text](image-2.png)
+
 ## 3. RecyclerView Multiple View Type
 
-**RecyclerView** có thể hiển thị nhiều loại item khác nhau trong cùng một RecyclerView.
+Khi `RecyclerView` cần hiển thị nhiều loại item khác nhau trong cùng một list ta sẽ sử dụng `RecyclerView Multiple View Type`
 
 **Cách làm:**
 1. Override hàm `getItemViewType(position: Int)` để phân biệt loại item ở từng vị trí.
 2. Trong `onCreateViewHolder`, inflate layout tương ứng theo viewType.
 3. Trong `onBindViewHolder`, bind dữ liệu phù hợp với loại item.
+
+**Ví dụ:**
+Có một danh sách gồm Header , các Item thông thường, và một Footer:
+
+```kotlin
+companion object {
+    const val VIEW_TYPE_HEADER = 0
+    const val VIEW_TYPE_ITEM = 1
+    const val VIEW_TYPE_FOOTER = 2
+}
+
+override fun getItemViewType(position: Int): Int {
+    return when (position) {
+        0 -> VIEW_TYPE_HEADER
+        itemCount - 1 -> VIEW_TYPE_FOOTER
+        else -> VIEW_TYPE_ITEM
+    }
+}
+
+override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
+    return when (viewType) {
+        VIEW_TYPE_HEADER -> HeaderViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.header_layout, parent, false))
+        VIEW_TYPE_FOOTER -> FooterViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.footer_layout, parent, false))
+        else -> ItemViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.item_layout, parent, false))
+    }
+}
+
+override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
+    when (holder) {
+        is HeaderViewHolder -> {
+            // bind dữ liệu header
+        }
+        is ItemViewHolder -> {
+            // bind dữ liệu item (ví dụ: user, sản phẩm, ...)
+        }
+        is FooterViewHolder -> {
+            // bind dữ liệu footer
+        }
+    }
+}
+```
+
+#### Ứng dụng thực tế:
+- Danh sách chat có ngày (header), tin nhắn (item), thông báo (footer).
+- Danh sách sản phẩm có banner (header), sản phẩm (item), quảng cáo (item khác), v.v.
+- News Feed có nhiều loại post: ảnh, video, text...
+
+Chú ý cuối bài:
+- [Thêm sửa xóa các item](https://stackoverflow.com/questions/49839709/recyclerview-notify-item-inserted-messes-up-the-whole-list#new-answer?newreg=48c88e889e7441eab7ab7993062f4fac)
+- [Trang trí RecyclerView](https://stackoverflow.com/questions/24618829/how-to-add-dividers-and-spaces-between-items-in-recyclerview)
