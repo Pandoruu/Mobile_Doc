@@ -51,7 +51,7 @@ SharedPreferences
 | Kiến trúc        | Nhúng, không cần server               | Client-server, cần server           |
 | Lưu trữ          | 1 file duy nhất trên ổ đĩa            | Nhiều file, lưu trữ trên server     |
 | Hiệu năng        | Nhanh với dữ liệu nhỏ, ít kết nối     | Tốt với dữ liệu lớn, nhiều kết nối  |
-| Quản lý          | người dùng	Không hỗ trợtrợ            | Hỗ trợ phân quyền, nhiều user       |
+| Quản lý          | người dùng	Không hỗ trợ               | Hỗ trợ phân quyền, nhiều user       |
 | Khả năng mở rộng | Hạn chế, phù hợp ứng dụng nhỏ         | Cao, phù hợp ứng dụng lớn           |
 | Cài đặt          | Đơn giản, chỉ cần file thư viện       | Phức tạp hơn, cần cài server        |
 | Bảo mật          | Đơn giản                              | Tốt hơn, nhiều tính năng nâng cao   |
@@ -85,7 +85,7 @@ Thêm các dòng sau vào `dependencies` trong `buid.gradle` của app:
 
 ```kts
 plugins {
-    id("kotlin-kapt)
+    id("kotlin-kapt")
 }
 
 dependencies {
@@ -216,7 +216,7 @@ data class RemoteUser(
     val hasVpn: Boolean
 ) : User()
 ```
-### 3.2 Data Access object
+### 3.2 Data Access Object
 **DAO** (Data Access Object) là một interface/abstract class trong Room Database, dùng để xác định các phương thức truy cập và thao tác dữ liệu với các bảng trong cơ sở dữ liệu. DAO cung cấp các phương thức như thêm, sửa, xóa, truy vấn dữ liệu một cách an toàn và hiệu quả.
 
 **DAO** thường được khai báo bằng `interface` hoặc `abstract class`, sử dụng các annotation của Room:
