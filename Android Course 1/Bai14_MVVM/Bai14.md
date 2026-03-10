@@ -63,14 +63,52 @@ val viewModel: UserViewModel by activityViewModels()
 | Mất dữ liệu khi scope bị destroy                                                     | Giữ dữ liệu chừng nào Activity chưa bị destroy                                  |
 | Có thể truyền ViewModelStoreOwner khác để thay đổi scope (`requireParentFragment()`) | Mặc định scope là Activity cha                                                  |
 
-#### LiveData kết hợp với ViewModel
-**LiveData**: LiveData là một container dữ liệu có thể quan sát được (observable data holder), thuộc `androidx.lifecycle.`.
+#### LiveData
 
-**Các loại LiveData:**
-- **LiveData<T>**: Chỉ đọc, không cập nhật dữ liệu được.
-- **MutableLiveData<T>**: Có thể đọc và ghi dữ liệu.
-- **MediatorLiveData<T>**: Có thể quan sát nhiều nguồn LiveData khác nhau.
-- **SingleLiveEvent**: Custom LiveData dùng cho sự kiện chỉ xảy ra một lần (ví dụ: navigation).
+##### 1. LiveData là gì?
+
+**LiveData** là một observable data holder (container lưu trữ dữ liệu có thể quan sát) nhận biết vòng đời (`lifecycle-aware`). Nó giúp UI tự động cập nhật khi dữ liệu thay đổi **và** tránh crash khi UI đã bị hủy.
+
+Đặc điểm:
+- Nhận biết trạng thái `LifecycleOwner` (Activity / Fragment / View Lifecycle Owner).
+- Chỉ thông báo (dispatch) giá trị tới các Observer ở trạng thái `STARTED` hoặc `RESUMED` (gọi chung là "active").
+- Tự động gỡ Observer khi vòng đời bị `DESTROYED`.
+- Tồn tại trong **ViewModel** để “sống sót” sau thay đổi cấu hình (xoay màn hình, thay đổi ngôn ngữ…).
+
+---
+
+##### 2. Các loại LiveData thường dùng
+
+| Loại                                     | Mô tả                               | Khi dùng                                      |
+| ---------------------------------------- | ----------------------------------- | --------------------------------------------- |
+| `LiveData<T>`                            | Chỉ đọc ngoài UI                    | Expose ra từ ViewModel                        |
+| `MutableLiveData<T>`                     | Đọc + ghi                           | Chỉ dùng nội bộ trong ViewModel               |
+| `MediatorLiveData<T>`                    | Kết hợp nhiều nguồn LiveData        | Tổng hợp nhiều nguồn dữ liệu (Remote + Local) |
+| `Transformations.map()`                  | Biến đổi đồng bộ                    | Trong chuỗi UI formatting                     |
+| `Transformations.switchMap()`            | Chuyển nguồn phụ thuộc giá trị      | Truy vấn theo key động (id, query)            |
+| (Custom) Event Wrapper / SingleLiveEvent | Sự kiện một lần (navigation, toast) | Tránh lặp lại sau rotate                      |
+
+> Lưu ý: Android không cung cấp chính thức `SingleLiveEvent`; đây là pattern tự tạo (xem thêm mục “Xử lý sự kiện một lần”).
+
+---
+
+##### 3. Cách hoạt động với vòng đời
+
+LiveData chỉ gọi Observer khi:
+- Có ít nhất một Observer active.
+- Giá trị thay đổi qua `setValue()` hoặc `postValue()`.
+
+Trạng thái Observer được tính theo `Lifecycle.State`:
+- Active: `STARTED`, `RESUMED`
+- Inactive: `INITIALIZED`, `CREATED`
+- Gỡ bỏ: `DESTROYED`
+
+##### 4. `setValue()` vs `postValue()`
+
+| Hàm           | Thread dùng được | Thời điểm dispatch      | Gộp giá trị (coalesce)                            |
+| ------------- | ---------------- | ----------------------- | ------------------------------------------------- |
+| `setValue()`  | Main thread      | Ngay lập tức            | Không                                             |
+| `postValue()` | Bất kỳ thread    | Đẩy vào main loop (trễ) | Có: nếu gọi nhiều lần nhanh, chỉ gửi giá trị cuối |
 
 **Tại sao lại dùng LiveData:**
 - Kết hợp chặt với ViewModel: Không bị reset khi xoay màn hình.
