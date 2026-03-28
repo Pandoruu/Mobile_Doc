@@ -1,7 +1,11 @@
-1. SOLID, KISS, DRY
-2. Dependency Injection, Manual DI
-3. Clean Architecture
-4. Modularization
+1. Giới thiệu
+2. SOLID
+3. KISS
+4. DRY
+5. Dependency Injection, Manual DI
+6. Clean Architecture
+7. Modularization
+8. Mối quan hệ giữa các khái niệm
 
 # Buổi 5: Design Principles và Clean Architecture trong Android
 
@@ -606,7 +610,8 @@ Trong Clean Architecture, code được tổ chức thành các **tầng (layer)
 data class User(
     val id: Int,
     val name: String,
-    val email: String
+    val email: String,
+    val isActive: Boolean = true
 )
 
 // Repository Interface - chỉ là hợp đồng, không có implementation
@@ -637,14 +642,33 @@ Tầng này chịu trách nhiệm **cung cấp dữ liệu** cho ứng dụng. T
 data class UserDto(
     @SerializedName("id") val id: Int,
     @SerializedName("full_name") val fullName: String,
-    @SerializedName("email_address") val email: String
+    @SerializedName("email_address") val email: String,
+    @SerializedName("is_active") val isActive: Boolean = true
 )
 
-// Hàm ánh xạ từ DTO sang Entity
+// Data Model cho Room Database
+@Entity(tableName = "users")
+data class UserEntity(
+    @PrimaryKey val id: Int,
+    val name: String,
+    val email: String,
+    val isActive: Boolean = true
+)
+
+// Hàm ánh xạ từ DTO sang Domain Entity
 fun UserDto.toDomain(): User = User(
     id = id,
     name = fullName,
-    email = email
+    email = email,
+    isActive = isActive
+)
+
+// Hàm ánh xạ từ Room Entity sang Domain Entity
+fun UserEntity.toDomain(): User = User(
+    id = id,
+    name = name,
+    email = email,
+    isActive = isActive
 )
 
 // Repository Implementation - implement interface từ Domain Layer
